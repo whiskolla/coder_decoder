@@ -1,3 +1,6 @@
+using Microsoft.Office.Interop.Excel;
+using System.Collections.Generic;
+
 namespace FaLP_1
 {
 
@@ -23,9 +26,44 @@ namespace FaLP_1
             char k = alphabet.Where(x => x.Value == i).FirstOrDefault().Key;
             return k;
         }
+        public Dictionary<char, int> alphabet = new Dictionary<char, int>();
+        public void WorkingExcel() {
+            Dictionary<char, int> alfavit = new Dictionary<char, int>();
+            Microsoft.Office.Interop.Excel.Application ObjWorkExcel = new Microsoft.Office.Interop.Excel.Application(); //открыть эксель
+            Microsoft.Office.Interop.Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open(@"C:\Users\Anastasia\Desktop\учеба 6 сем\FaLP_1\alphabet.xlsx", Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing); //открыть файл
+            Microsoft.Office.Interop.Excel.Worksheet ObjWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)ObjWorkBook.Sheets[1]; //получить 1 лист
+            var lastCell = ObjWorkSheet.Cells.SpecialCells(Microsoft.Office.Interop.Excel.XlCellType.xlCellTypeLastCell);//1 €чейку
+            string[,] list = new string[lastCell.Column, lastCell.Row]; // массив значений с листа равен по размеру листу
+            char ch = ' ';
+            int integ = -1;
+            for (int i = 0; i < lastCell.Column; i++) {  //по всем колонам
+                for (int j = 0; j < lastCell.Row; j++) {  // по всем строкам
+                    list[i, j] = ObjWorkSheet.Cells[j + 1, i + 1].Text.ToString();//считываем текст в строку
+                    if (j == 0)
+                    {
+                        ch = char.Parse(list[i, j]);
+                    }
+                    if (j == 1)
+                    {
+                        integ = int.Parse(list[i, j]);
+                    }
+                }
+                if ((ch != ' ') && (integ != -1))
+                {
+                    alfavit.Add(ch, integ);
+                }
+                ch = ' ';
+                integ = -1;
+            }
+            alphabet = alfavit;
 
-        Dictionary<char, int> alphabet = new Dictionary<char, int>(){
-/*                { 1, 'а'},
+            ObjWorkBook.Close(false, Type.Missing, Type.Missing); //закрыть не сохран€€
+            ObjWorkExcel.Quit(); // выйти из эксел€
+            GC.Collect(); // убрать за собой
+        }
+
+/* Dictionary<char, int> aalphabet = new Dictionary<char, int>(){
+               { 1, 'а'},
                 { 2, 'б'},
                 { 3, 'в'},
                 { 4, 'г'},
@@ -57,7 +95,7 @@ namespace FaLP_1
                 { 30, 'ь'},
                 { 31, 'э'},
                 { 32, 'ю'},
-                { 33, '€'},*/
+                { 33, '€'},
                 {'а',1},
                 {'б',2},
                 { 'в',3},
@@ -92,7 +130,7 @@ namespace FaLP_1
                 { 'ю',32},
                 {'€',33}
 
-        };
+        };*/
 
         public Form1()
         {
@@ -102,6 +140,7 @@ namespace FaLP_1
         private void button1_Click(object sender, EventArgs e)
         {
             //зашифровать
+            WorkingExcel();
             var text = textBox1.Text;
             char[] textt = new char[text.Length];
             int[] result = new int[text.Length];
@@ -109,7 +148,7 @@ namespace FaLP_1
     
             for (int i = 0; i < text.Length; i++)
             {
-               result[i] = alphabet[textt[i]];  
+                 result[i] = alphabet[textt[i]];  
             }
             string answer = IntArrayToString(result);
             textBox1.Text = answer;
@@ -118,6 +157,7 @@ namespace FaLP_1
         private void button2_Click(object sender, EventArgs e)
         {
             //расшифровать
+            WorkingExcel();
             var text = textBox1.Text;
             char[] result = new char[text.Length];
             int[] textt = new int[text.Length];
